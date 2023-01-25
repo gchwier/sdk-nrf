@@ -131,3 +131,21 @@ or reset the board once again and MCUboot should revert the images, showing this
    Version: 0.0.0+0, board: nrf9160dk_nrf9160
 
 Version of MCUBoot image should be verified after every reset.
+
+Test Automation
+===============
+This is a proposal, how to automate the manual test procedure using pytest and twister2 plugin.
+
+1) Install pytest  and twister2  plugin: follow instruction under 
+   `zephyrproject-rtos/twister <https://github.com/zephyrproject-rtos/twister>`_.
+
+2) Generate hardware map file. Remember to update options marked as 'unknown' with correct values,
+   e.g. update platform  with nrf9160dk_nrf9160_ns.
+
+3) Run test scenario.
+
+.. code-block:: console
+
+    pytest ncs/nrf/tests/modules/mcuboot/upgrade_from_external_flash  --device-testing \
+    --hardware-map=hardware_map.yml --platform=nrf9160dk_nrf9160_ns --log-level=INFO -s
+
