@@ -36,7 +36,7 @@ def test_upgrade(dut: DeviceAbstract, build_manager: BuildManager):
 
     new_build_dir = str(build_manager.build_config.build_dir) + '_second_image'
     build_manager.build_config.build_dir = new_build_dir
-    build_manager.build_config.extra_configs.append('CONFIG_MCUBOOT_IMAGE_VERSION="1.1.1+1"')
+    build_manager.build_config.cmake_extra_args.append('-DCONFIG_MCUBOOT_IMAGE_VERSION="1.1.1+1"')
     build_manager.build()
 
     app_update_bin = str((Path(new_build_dir) / 'zephyr' / 'app_update.bin').resolve())
