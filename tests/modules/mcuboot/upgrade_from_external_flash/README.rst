@@ -12,6 +12,7 @@ Available configurations for:
 * nrf52840dk_nrf52840
 * nrf5340dk_nrf5340_cpuapp
 * nrf9160dk_nrf9160_ns
+* nrf9160dk_nrf9160
 
 This test scenario will be later automated with `TwisterV2 <https://github.com/zephyrproject-rtos/twister>`_ framework.
 
@@ -131,6 +132,53 @@ or reset the board once again and MCUboot should revert the images, showing this
    Version: 0.0.0+0, board: nrf9160dk_nrf9160
 
 Version of MCUBoot image should be verified after every reset.
+
+Test upgrade of the netcore
+***************************
+With nRF5340 one can test upgrading a multi-image build.
+
+Build applications and flash the board:
+
+.. code-block:: console
+
+   west build -p always -b nrf5340dk_nrf5340_cpuapp nrf/tests/modules/mcuboot/upgrade_from_external_flash -d build-53-netcore-upgrade -- -DCONF_FILE=prj_netcore.conf
+   west build -p always -b nrf5340dk_nrf5340_cpuapp nrf/tests/modules/mcuboot/upgrade_from_external_flash -d build-53-netcore-upgrade1111 -- -DCONF_FILE=prj_netcore.conf -DCONFIG_MCUBOOT_IMAGE_VERSION=\"1.1.1+1\"
+   west flash --erase -d build-53-ns-netcore-upgrade
+
+Upload images for application and network cores, mark them to be tested:
+
+.. code-block:: console
+
+   mcumgr -t 60 --conntype serial --connstring=/dev/ttyACM2 image upload build-53-netcore-upgrade1111/zephyr/app_update.bin -e -n 0
+   mcumgr -t 60 --conntype serial --connstring=/dev/ttyACM2 image upload build-53-netcore-upgrade1111/zephyr/net_core_app_update.bin -e -n 1
+   mcumgr -t 60 --conntype serial --connstring=/dev/ttyACM0 image list
+   mcumgr -t 60 --conntype serial --connstring=/dev/ttyACM0 image test <hash of image 0>
+   mcumgr -t 60 --conntype serial --connstring=/dev/ttyACM0 image test <hash of image 1>
+   mcumgr -t 60 --conntype serial --connstring=/dev/ttyACM0 reset
+
+Observe in the console output of the application core:
+
+.. code-block:: console
+
+   I: Image upgrade secondary slot -> primary slot
+   I: Erasing the primary slot
+   I: Copying the secondary slot to the primary slot: 0x11398 bytes
+   I: Image upgrade secondary slot -> primary slot
+   I: Erasing the primary slot
+   I: Copying the secondary slot to the primary slot: 0x4ef4 bytes
+   I: Turned on network core                           
+   I: Turned off network core                          
+   I: Bootloader chainload address offset: 0x10000     
+   *** Booting Zephyr OS build v3.2.99-ncs2-rc1-2-gbf10b681f176 ***
+   Version: 1.1.1+1, board: nrf5340dk_nrf5340_cpuapp
+
+In the console of the network core:
+
+.. code-block:: console
+
+   I: Transfer done
+   *** Booting Zephyr OS build 71cacd54431e ***
+
 
 Test Automation
 ===============
