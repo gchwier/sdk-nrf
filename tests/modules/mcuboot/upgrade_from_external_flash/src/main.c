@@ -6,7 +6,7 @@
 
 #include <zephyr/kernel.h>
 
-void main(void)
+int main(void)
 {
 	#ifdef CONFIG_SPI_NOR
 	printk("SPI NOR Flash enabled\n");
@@ -25,4 +25,5 @@ void main(void)
 	#endif
 
 	printk("Version: %s, board: %s\n", CONFIG_MCUBOOT_IMAGE_VERSION, CONFIG_BOARD);
+	return 0;
 }
